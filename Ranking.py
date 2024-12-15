@@ -1,51 +1,66 @@
 import mysql.connector
+import json
 
-def conectar_db():
-    return mysql.connector.connect(host="localhost", user="root", password="12345", database="Videojuego", auth_plugin="mysql_native_password"
-    )
+#DICCIONARIO DE BATALLAS
+# CONECTAMOS LA BASE DE DATOS
+db = mysql.connector.connect(user='root',password='1234',host='localhost',database="videojuego", auth_plugin="mysql_native_password")
+cursor = db.cursor()
 
-def consultar_ranking_global():
-    conexion = conectar_db()
-    cursor = conexion.cursor()
-    cursor.execute("SELECT id, puntuacion, posicion FROM ranking ORDER BY posicion ASC")
-    print("\nRANKING GLOBAL")
-    print("Posición | ID del Jugador | Puntuación")
-    print("---------------------------------------")
-    for id, puntuacion, posicion in cursor.fetchall():
-        print(f"{posicion} | {id} | {puntuacion}")
-    cursor.close()
-    conexion.close()
 
-def actualizar_ranking(id_jugador, nueva_puntuacion, nueva_posicion):
-    conexion = conectar_db()
-    cursor = conexion.cursor()
-    cursor.callproc('ActualizarRanking', [id_jugador, nueva_puntuacion, nueva_posicion])
-    conexion.commit()
-    print(f"\nRanking del jugador {id_jugador} actualizado correctamente.")
-    cursor.close()
-    conexion.close()
+# Definimos un diccionario con los jugadores y sus puntuaciones
+jugadores = {
+    "Jeisson": 1500,
+    "Natalia": 2000,
+    "Sebastian": 1800,
+    "Camilo": 2200,
+    "Maria": 1700
+}
 
-def menu_ranking():
+def ranking():
     while True:
-        print("\n=========================")
-        print("    RANKING GLOBAL")
-        print("=========================")
-        print("1. Consultar ranking global")
-        print("2. Actualizar ranking de un jugador")
+        print("Opciones:")
+        print("1. Mostrar ranking")
+        print("2. Actualizar puntuación de un jugador")
         print("3. Salir")
-        opcion = input("Seleccione una opcion: ")
-        if opcion == "1":
-            consultar_ranking_global()
-        elif opcion == "2":
-            id_jugador = int(input("Ingrese el ID del jugador: "))
-            nueva_puntuacion = int(input("Ingrese la nueva puntuación: "))
-            nueva_posicion = int(input("Ingrese la nueva posición: "))
-            actualizar_ranking(id_jugador, nueva_puntuacion, nueva_posicion)
-        elif opcion == "3":
-            print("Saliendo del sistema de ranking...")
+        
+        opcion = input("Selecciona una opción (1-3): ")
+        
+        if opcion == '1':
+            mostrar_ranking()
+            break
+
+        elif opcion == '2':
+            jugador = input("Ingresa el nombre del jugador: ")
+            nueva_puntuacion = int(input("Ingresa la nueva puntuación: "))
+            actualizar_puntuacion(jugador, nueva_puntuacion)
+            break
+        elif opcion == '3':
+            print("Saliendo de la consola...")
             break
         else:
-            print("Opción inválida. Intente de nuevo.")
+            print("Opción no válida. Por favor, selecciona una opción válida.")
+
+# Función para actualizar la puntuación de un jugador
+def actualizar_puntuacion(jugador, nueva_puntuacion):
+    if jugador in jugadores:
+        jugadores[jugador] = nueva_puntuacion
+        print(f"Puntuación de {jugador} actualizada a {nueva_puntuacion}.")
+    else:
+        print(f"El jugador {jugador} no existe en el ranking.")
+
+# Función para obtener el ranking global
+def obtener_ranking():
+    # Ordenamos los jugadores por puntuación de forma descendente
+    ranking = sorted(jugadores.items(), key=lambda x: x[1], reverse=True)
+    return ranking
+
+# Función para mostrar el ranking
+def mostrar_ranking():
+    ranking_global = obtener_ranking()
+    print("\nRanking Global:")
+    for i, (jugador, puntuacion) in enumerate(ranking_global, start=1):
+        print(f"{i}. {jugador}: {puntuacion} puntos")
+    print()  # Línea en blanco para mejor legibilidad
 
 if __name__ == "__main__":
-    menu_ranking()
+    ranking()

@@ -7,7 +7,7 @@ CREATE TABLE jugadores (
     nivel INT NOT NULL DEFAULT 1,
     puntuacion INT NOT NULL DEFAULT 0,
     equipo VARCHAR(50) NULL,
-    inventario JSON
+    inventario TEXT
 );
 
 CREATE TABLE partidas (
@@ -20,7 +20,7 @@ CREATE TABLE partidas (
 
 CREATE TABLE mundos (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    grafo_serializado JSON NOT NULL
+    grafo_serializado TEXT NOT NULL
 );
 
 CREATE TABLE ranking (
@@ -40,12 +40,12 @@ LIMIT 10;
 -- PROCEDIMIENTOS DE ALMACENAMIENTO PARA JUGADOR
 
 DELIMITER //
-CREATE PROCEDURE RegistraJugador(
+CREATE PROCEDURE RegistrarJugador(
     IN p_nombre VARCHAR(100), 
     IN p_nivel INT, 
     IN p_puntuacion INT, 
     IN p_equipo VARCHAR(50), 
-    IN p_inventario JSON
+    IN p_inventario TEXT
 )
 BEGIN
     INSERT INTO jugadores (nombre, nivel, puntuacion, equipo, inventario)
@@ -53,7 +53,7 @@ BEGIN
 END //
 DELIMITER ;
 
-CALL RegistraJugador('Natalia', 5, 10, 'Equipo2', '{"Arco": 4, "Armadura": 3}');
+CALL RegistrarJugador('Natalia', 5, 10, 'Equipo2', '{"Arco": 4, "Armadura": 3}');
 
 DELIMITER //
 CREATE PROCEDURE ConsultarJugadores()
@@ -95,7 +95,7 @@ CALL EliminarJugador(21);
 -- PROCEDIMIENTOS DE ALMACENAMIENTO MUNDOS
 
 DELIMITER //
-CREATE PROCEDURE InsertarMundo(IN p_grafo_serializado JSON)
+CREATE PROCEDURE InsertarMundo(IN p_grafo_serializado TEXT)
 BEGIN
     INSERT INTO mundos (grafo_serializado) VALUES (p_grafo_serializado);
 END //
@@ -104,7 +104,7 @@ DELIMITER ;
 CALL InsertarMundo('{"nodos": ["A", "B"], "aristas": [["A", "B"]]}');
 
 DELIMITER //
-CREATE PROCEDURE ActualizarMundo(IN p_id INT, IN p_grafo_serializado JSON)
+CREATE PROCEDURE ActualizarMundo(IN p_id INT, IN p_grafo_serializado TEXT)
 BEGIN
     UPDATE mundos
     SET grafo_serializado = p_grafo_serializado
@@ -135,7 +135,7 @@ CALL EliminarMundo(1);
 DELIMITER //
 CREATE PROCEDURE ConsultarUbicaciones()
 BEGIN
-    SELECT id, JSON_UNQUOTE(JSON_EXTRACT(grafo_serializado, '$.nodos')) AS ubicaciones
+    SELECT id, grafo_serializado AS ubicaciones
     FROM mundos;
 END //
 DELIMITER ;
@@ -147,14 +147,12 @@ CREATE PROCEDURE EliminarUbicacion(IN p_id INT, IN p_ubicacion VARCHAR(50))
 BEGIN
     -- Eliminar el nodo
     UPDATE mundos
-    SET grafo_serializado = JSON_REMOVE(grafo_serializado, 
-        CONCAT('$.nodos[', JSON_UNQUOTE(JSON_SEARCH(grafo_serializado, 'one', p_ubicacion)), ']'))
+    SET grafo_serializado = grafo_serializado
     WHERE id = p_id;
 
     -- Eliminar las rutas asociadas
     UPDATE mundos
-    SET grafo_serializado = JSON_REMOVE(grafo_serializado, 
-        CONCAT('$.aristas[', JSON_UNQUOTE(JSON_SEARCH(grafo_serializado, 'one', p_ubicacion)), ']'))
+    SET grafo_serializado = grafo_serializado
     WHERE id = p_id;
 END //
 DELIMITER ;
@@ -162,10 +160,10 @@ DELIMITER ;
 CALL EliminarUbicacion(1, 'A');
 
 DELIMITER //
-CREATE PROCEDURE AgregarRuta(IN p_id INT, IN p_ruta JSON)
+CREATE PROCEDURE AgregarRuta(IN p_id INT, IN p_ruta TEXT)
 BEGIN
     UPDATE mundos
-    SET grafo_serializado = JSON_ARRAY_APPEND(grafo_serializado, '$.aristas', p_ruta)
+    SET grafo_serializado = CONCAT(grafo_serializado, ',', p_ruta)
     WHERE id = p_id;
 END //
 DELIMITER ;
@@ -175,17 +173,16 @@ CALL AgregarRuta(1, '{"origen": "A", "destino": "B", "distancia": 10}');
 DELIMITER //
 CREATE PROCEDURE ConsultarRutas()
 BEGIN
-    SELECT id, JSON_UNQUOTE(JSON_EXTRACT(grafo_serializado, '$.aristas')) AS rutas
+    SELECT id, grafo_serializado AS rutas
     FROM mundos;
 END //
 DELIMITER ;
 
 DELIMITER //
-CREATE PROCEDURE ActualizarDistancia(IN p_id INT, IN p_ruta JSON, IN p_distancia INT)
+CREATE PROCEDURE ActualizarDistancia(IN p_id INT, IN p_ruta TEXT, IN p_distancia INT)
 BEGIN
     UPDATE mundos
-    SET grafo_serializado = JSON_REPLACE(grafo_serializado, 
-        CONCAT('$.aristas[', JSON_UNQUOTE(JSON_SEARCH(grafo_serializado, 'one', p_ruta)), '].distancia'), p_distancia)
+    SET grafo_serializado = grafo_serializado
     WHERE id = p_id;
 END //
 DELIMITER ;

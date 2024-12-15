@@ -7,14 +7,14 @@ cursor = db.cursor()
 def menu():
     while True:
         print("\n=========================")
-        print("**** REGISTRAR JUGADORES ****")
+        print("   REGISTRAR JUGADORES    ")
         print("=========================")
         print("1. Registarar a un jugador")
         print("2. Consultar a los jugadores")
         print("3. Modificar a un jugador")
         print("4. Eliminar a un jugador")
         print("5. Salir")
-        opcion = input("\nPOR FAVOR ELIJA UNA OPCION PARA CONTINUAR: ")
+        opcion = input("\nPOR FAVOR ELIJA UNA OPCION PARA CONTINUAR: \n")
 
         if opcion == "1":
             RegistrarJugador()
