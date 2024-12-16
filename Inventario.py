@@ -1,9 +1,7 @@
-#TABLAS HASH
 import mysql.connector
 import json
 
 #TABLA HASH
-# CONECTAMOS LA BASE DE DATOS
 db = mysql.connector.connect(user='root',password='12345',host='localhost',database="videojuego", auth_plugin="mysql_native_password")
 cursor = db.cursor()
 

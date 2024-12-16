@@ -45,6 +45,7 @@ def RegistrarJugador():
             cursor.callproc('RegistraJugador', [nombre, nivel, puntuacion, equipo, inventario])
             db.commit()
             print("El jugador ha sido registrado correctamente.")
+
         finally:
             cursor.close()
             db.close()

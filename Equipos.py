@@ -1,8 +1,7 @@
 import mysql.connector
 import json
 
-#DICCIONARIO DE BATALLAS
-# CONECTAMOS LA BASE DE DATOS
+# DICCIONARIO DE BATALLAS
 db = mysql.connector.connect(user='root',password='12345',host='localhost',database="videojuego", auth_plugin="mysql_native_password")
 cursor = db.cursor()
 
