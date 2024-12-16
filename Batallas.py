@@ -6,6 +6,33 @@ import json
 db = mysql.connector.connect(user='root',password='12345',host='localhost',database="videojuego", auth_plugin="mysql_native_password")
 cursor = db.cursor()
 
+def batallas():
+
+    fechas_partidas = []
+
+    while True:
+        print("\n=========================")
+        print("     GESTION PARTIDAS    ")
+        print("=========================")
+        print("1. Agregar fecha de partida")
+        print("2. Mostrar todas las fechas de partidas")
+        print("3. Salir")
+        
+        opcion = input("Por favor selecciona opcion para continuar: ")
+
+        if opcion == '1':
+            fecha = input("Ingresa la fecha de la partida en el siguiente (formato YYYY-MM-DD): ")
+            fechas_partidas.append(fecha)
+            print(f"Fecha {fecha} agregada exitosamente.")
+        elif opcion == '2':
+            print("\nFechas de partidas almacenadas:")
+            for fecha in fechas_partidas:
+                print(fecha)
+        elif opcion == '3':
+            print("Saliendo de la consola.")
+            break
+        else:
+            print("Opción no válida. Por favor, selecciona una opción válida.")
 
 class Node:
     def __init__(self, fecha, partida):
@@ -73,16 +100,13 @@ if __name__ == "__main__":
     partida2 = Partida("Equipo C", "Equipo D", "3-0")
     partida3 = Partida("Equipo E", "Equipo F", "1-1")
 
-    # Insertar partidas en el árbol
     arbol.insertar("2023-10-01", partida1)
     arbol.insertar("2023-10-02", partida2)
     arbol.insertar("2023-10-03", partida3)
 
-    # Mostrar todas las partidas en orden
     print("Historial de partidas:")
     arbol.mostrar_inorden()
 
-    # Buscar una partida por fecha
     fecha_busqueda = "2023-10-02"
     partida_encontrada = arbol.buscar(fecha_busqueda)
     if partida_encontrada:
@@ -90,32 +114,5 @@ if __name__ == "__main__":
     else:
         print(f"No se encontró partida en la fecha {fecha_busqueda}.")
 
-
-def main():
-
-    fechas_partidas = []
-
-    while True:
-        print("\n--- Consola de Almacenamiento de Fechas de Partidas ---")
-        print("1. Agregar fecha de partida")
-        print("2. Mostrar todas las fechas de partidas")
-        print("3. Salir")
-        
-        opcion = input("Selecciona una opción (1-3): ")
-
-        if opcion == '1':
-            fecha = input("Ingresa la fecha de la partida (formato YYYY-MM-DD): ")
-            fechas_partidas.append(fecha)
-            print(f"Fecha {fecha} agregada exitosamente.")
-        elif opcion == '2':
-            print("\nFechas de partidas almacenadas:")
-            for fecha in fechas_partidas:
-                print(fecha)
-        elif opcion == '3':
-            print("Saliendo de la consola.")
-            break
-        else:
-            print("Opción no válida. Por favor, selecciona una opción válida.")
-
 if __name__ == "__main__":
-    main()
+    batallas()
